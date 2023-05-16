@@ -18,7 +18,6 @@ constexpr uint32_t shift_left_and_add(const uint32_t a, const uint32_t b)
 template <int pos, int bits, int... T>
 struct field
 {
-private:
    static constexpr uint32_t start_index = pos / 8;
    static constexpr uint32_t bit_offset = pos % 8;
    static constexpr uint32_t byte_count = 1 + (bit_offset + bits - 1) / 8;
@@ -26,7 +25,6 @@ private:
    static constexpr uint32_t mask = uint32_t((uint64_t(1) << bits) - 1);
    static constexpr uint32_t shifted_mask = (mask << shift);
 
-public:
    // Set the value given in v in the buffer pointed to by the iterator first
    // according to the bit pattern given in template arguments pos, bits, T...
    template <class InputIt>
@@ -42,7 +40,7 @@ public:
    {
       return get_with_size(start).first;
    }
-private:
+
    template <std::size_t S = 0, class InputIt>
    static constexpr auto get_with_size(InputIt start) ->
       typename std::enable_if_t<S == sizeof...(T),
@@ -77,6 +75,7 @@ private:
       return res + bits;
    }
 
+private:
    template <class InputIt>
    static constexpr uint32_t do_get(InputIt start)
    {
