@@ -10,6 +10,8 @@
 #include <sstream>
 
 namespace {
+
+
 constexpr std::array<uint8_t, 4> buffer{0x12, 0x34, 0x56, 0x78};
 constexpr std::array<bitpack::field_specifier, 7> fields{
     bitpack::field_specifier{0, 4},  bitpack::field_specifier{8, 4},
@@ -19,6 +21,17 @@ constexpr std::array<bitpack::field_specifier, 7> fields{
 constexpr bitpack::field_object f{fields};
 static_assert(buffer.size() == 4);
 static_assert(f.get(cbegin(buffer)) == 0x13254678);
+
+constexpr auto generate_buffer() {
+  std::array<uint8_t, 4> buffer{};
+  std::iota(buffer.begin(), buffer.end(), 0);
+  f.set(buffer.begin(), 0x13254678);
+  return buffer;
+}
+
+constexpr std::array<uint8_t, 4> buffer2 = generate_buffer();
+static_assert(buffer2 == buffer);
+
 } // namespace
 
 TEST(BitpackTest, RandomValuesAndFields) {
