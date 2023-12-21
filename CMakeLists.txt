@@ -19,3 +19,6 @@ target_include_directories(bitpack INTERFACE include/)
 add_executable(bitpack_test test/main.cpp)
 target_compile_options(bitpack_test PRIVATE -Wall -Wpedantic -Wextra -Werror)
 target_link_libraries(bitpack_test gtest_main bitpack)
+
+enable_testing() # Enable testing
+add_test(NAME bitpack_test COMMAND bitpack_test)
