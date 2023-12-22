@@ -28,6 +28,11 @@ struct field_specifier {
 
 class field_object {
 public:
+  template <typename... Args>
+  constexpr field_object(uint32_t pos, uint32_t bits, Args... args)
+      : fields_{copy(field_specifiers(pos, bits, args...))},
+        count_{sizeof...(args) / 2 + 1} {}
+
   template <typename Container>
   requires std::ranges::sized_range<Container> &&
       std::same_as<typename Container::value_type, field_specifier>
@@ -53,6 +58,19 @@ public:
   }
 
 private:
+  template <typename... Args>
+  constexpr auto field_specifiers(uint32_t pos, uint32_t bits, Args... args) {
+    std::array<field_specifier, 1 + sizeof...(args)> result{};
+    auto rest = field_specifiers(args...);
+    result[0] = field_specifier{pos, bits};
+    std::copy(std::cbegin(rest), std::cend(rest), std::begin(result) + 1);
+    return result;
+  }
+
+  constexpr auto field_specifiers(uint32_t pos, uint32_t bits) {
+    return std::array<field_specifier, 1>{{{pos, bits}}};
+  }
+
   template <class InputIt>
   constexpr void pack(const field_specifier &fs, InputIt start,
                       uint32_t v) const {

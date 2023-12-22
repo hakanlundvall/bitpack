@@ -12,9 +12,7 @@
 namespace {
 
 constexpr std::array<uint8_t, 4> buffer{0x12, 0x34, 0x56, 0x78};
-constexpr std::array<bitpack::field_specifier, 7> fields{
-    {{0, 4}, {8, 4}, {4, 4}, {16, 4}, {12, 4}, {20, 4}, {24, 8}}};
-constexpr bitpack::field_object f{fields};
+constexpr bitpack::field_object f{0, 4, 8, 4, 4, 4, 16, 4, 12, 4, 20, 4, 24, 8};
 static_assert(buffer.size() == 4);
 static_assert(f.get(cbegin(buffer)) == 0x13254678);
 
@@ -40,7 +38,7 @@ TEST(BitpackTest, RandomValuesAndFields) {
     std::array<uint8_t, 8> buffer{};
     std::vector<bitpack::field_specifier> fields1;
     std::vector<bitpack::field_specifier> fields2;
-    
+
     uint32_t total_bits = 0;
     uint32_t total_bits1 = 0;
     uint32_t total_bits2 = 0;
@@ -72,7 +70,7 @@ TEST(BitpackTest, RandomValuesAndFields) {
 
     uint32_t v1 = val_dis(gen);
     uint32_t v2 = val_dis(gen);
-    
+
     f1.set(begin(buffer), v1);
     auto b1 = f1.get(cbegin(buffer));
     auto b2 = f2.get(cbegin(buffer));
