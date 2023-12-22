@@ -26,9 +26,28 @@ struct field_specifier {
   uint32_t bits = 0;
 };
 
+/**
+ * @class field_object
+ * @brief Represents a collection of field specifiers used for packing and
+ * unpacking data.
+ *
+ * The field_object class provides methods for setting and getting values based
+ * on the specified field specifiers. It supports both variadic and
+ * container-based constructors for specifying the field specifiers. The field
+ * specifiers define the position and number of bits for each field in the
+ * packed data.
+ */
 class field_object {
 public:
   template <typename... Args>
+  /**
+   * @brief Constructs a `field_object` with the specified position and number
+   * of bits.
+   *
+   * @param pos The position of the first field.
+   * @param bits The number of bits in the first field.
+   * @param args Additional fields.
+   */
   constexpr field_object(uint32_t pos, uint32_t bits, Args... args)
       : fields_{copy(field_specifiers(pos, bits, args...))},
         count_{sizeof...(args) / 2 + 1} {}
@@ -36,9 +55,22 @@ public:
   template <typename Container>
   requires std::ranges::sized_range<Container> &&
       std::same_as<typename Container::value_type, field_specifier>
+  /**
+   * @brief Constructs a field_object with the given fields.
+   *
+   * @param fields The container of fields.
+   */
   constexpr field_object(const Container &fields)
       : fields_{copy(fields)}, count_{fields.size()} {}
 
+  /**
+   * @brief Packs a value into the buffer according to field specifiers given in
+   * the constructor.
+   *
+   * @tparam InputIt The type of the iterator.
+   * @param first The iterator pointing to the beginning of the buffer.
+   * @param v The value to pack into the buffer.
+   */
   template <class InputIt> constexpr void set(InputIt first, uint32_t v) const {
     uint32_t result_shift = 0;
     for (std::size_t i = count_; i > 0; --i) {
@@ -47,6 +79,14 @@ public:
     }
   }
 
+  /**
+   * @brief Retrieves a value from the given input iterator.
+   *
+   * @tparam InputIt The type of the input iterator.
+   * @param first The input iterator pointing to the buffer containing the value
+   * to retrieve.
+   * @return The retrieved value.
+   */
   template <class InputIt> constexpr uint32_t get(const InputIt first) const {
     uint32_t v{0};
     uint32_t result_shift = 0;
